@@ -34,6 +34,9 @@ jobs:
           haskell: true
           large-packages: true
           swap-storage: true
+
+      - name: Get Git ref
+        run: echo "REF=${{ github.event.pull_request && github.head_ref || github.ref_name }}" >> $GITHUB_ENV
       
       - name: Checkout
         uses: actions/checkout@v2
@@ -54,4 +57,4 @@ jobs:
           context: .
           file: ./Containerfile
           push: true
-          tags: ${{ env.IMAGE_REGISTRY }}:${{ github.ref_name }}, ${{ env.IMAGE_REGISTRY }}:${GITHUB_REF_NAME}
+          tags: ${{ env.IMAGE_REGISTRY }}:${{ github.ref_name }}, ${{ env.IMAGE_REGISTRY }}:${REF}
