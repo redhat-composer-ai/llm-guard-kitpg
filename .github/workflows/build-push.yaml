@@ -10,7 +10,7 @@ on:
 env:
   IMAGE_BASE_REGISTRY: quay.io
   IMAGE_REGISTRY: quay.io/wspinks0/llm_guard_kitpg
-  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+  REF: ${{ github.head_ref || github.ref_name }} 
 
 jobs:
   push:
@@ -35,9 +35,6 @@ jobs:
           large-packages: true
           swap-storage: true
 
-      - name: Get Git ref
-        run: echo "REF=${{ github.event.pull_request.base.ref || github.ref_name }}" >> $GITHUB_ENV
-      
       - name: Checkout
         uses: actions/checkout@v2
 
