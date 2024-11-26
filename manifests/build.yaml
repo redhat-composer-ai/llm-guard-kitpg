@@ -1,0 +1,68 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: kitpg
+labels:
+  paas.redhat.com/appcode: ${appcode}
+spec:
+  failedBuildsHistoryLimit: 2
+  runPolicy: Serial
+  source:
+    git:
+      uri: 'https://github.com/wes-spinks/llm-guard.git'
+      ref: dev
+  strategy:
+    dockerStrategy:
+      dockerfilePath: Containerfile
+      forcePull: true
+      env:
+        - name: APP_ROOT
+          value: /opt/app-root
+        - name: GIT_SSL_NO_VERIFY
+          value: 'true'
+        - name: APP_HOME
+          value: /opt/app-root
+        - name: APP_FILE
+          value: 'api.py'
+        - name: PIP_INDEX_URL
+          value: "https://nexus.corp.redhat.com/repository/pypi-all/simple"
+        - name: PIP_TRUSTED_HOST
+          value: "nexus.corp.redhat.com"
+  resources:
+    requests:
+      cpu: "750m"
+      memory: "2Gi"
+    limits:
+      cpu: 1
+      memory: "4Gi"
+  output:
+    imageLabels:
+    - name: com.redhat.paas.appcode
+      value: ${appcode}
+    to:
+      kind: DockerImage
+      name: images.paas.redhat.com/composer-ai/kitpg:dev
+    pushSecret:
+      name: images-paas-push-config
+  triggers:
+    - type: ConfigChange
+parameters:
+  - name: app
+    displayName: App
+    description: The label for objects created by template
+    required: true
+    value: lltapi
+  - name: tag
+    displayName: ImageTag
+    description: The registry image ref
+    required: true
+    value: main
+  - name: approot
+    displayName: AppRoot
+    description: The application root dir
+    required: true
+    value: /opt/app-root
+  - name: appcode
+    required: true
+    value: CAI-001
+

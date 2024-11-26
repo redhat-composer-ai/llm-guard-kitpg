@@ -1,0 +1,126 @@
+openapi: 3.0.2
+info:
+    title: New API
+    version: 1.0.0
+    description: A brand new API with no content.  Go nuts!
+paths:
+    /input:
+        summary: Scan input prompt
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/request_input'
+                required: true
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/prompt_scan'
+                    description: Input scans Response
+            summary: Scan input
+    /output:
+        summary: Output scan
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/request_input'
+                required: true
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/prompt_scan'
+                    description: Output guard scan response
+            summary: Output guard scan
+components:
+    schemas:
+        prompt_scan:
+            title: Root Type for prompt_scan
+            description: Results of scanning a prompt
+            required:
+                - scores
+                - status
+            type: object
+            properties:
+                sanitized_prompt:
+                    description: The cleaned prompt from the guard scanners
+                    type: string
+                status:
+                    description: If this result is a pass or fail
+                    type: boolean
+                scores:
+                    description: Scores of the individual scans
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/scan_result'
+                    properties:
+                        testa:
+                            type: object
+                            properties:
+                                score:
+                                    format: double
+                                    type: number
+                                passed:
+                                    type: boolean
+                        testb:
+                            type: object
+                            properties:
+                                score:
+                                    format: double
+                                    type: number
+                                passed:
+                                    type: boolean
+            example:
+                sanitized_prompt: my clean response
+                failed: false
+                scores:
+                    -
+                        name: testa
+                        score: 0.7
+                        valid: true
+                    -
+                        name: testb
+                        score: 0.7
+                        valid: true
+                    -
+                        name: testc
+                        score: 0.7
+                        valid: true
+        scan_result:
+            title: Root Type for scan_result
+            description: Scores of individual scans
+            type: object
+            properties:
+                name:
+                    type: string
+                score:
+                    format: double
+                    type: number
+                valid:
+                    type: boolean
+            example:
+                name: xxxx
+                score: 0.7
+                valid: true
+        request_input:
+            title: Root Type for request_input
+            description: Guard scan request
+            type: object
+            properties:
+                prompt:
+                    type: string
+            example:
+                prompt: unclean prompt
+    responses:
+        guardResponse:
+            content:
+                application/json:
+                    schema:
+                        $ref: '#/components/schemas/prompt_scan'
+            description: test

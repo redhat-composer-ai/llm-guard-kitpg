@@ -1,0 +1,17 @@
+bantopics:
+  config:
+    threshold: 0.5
+    topics:
+      - violence
+    use_onnx: False
+    fail_fast: False
+prompt_injection:
+  config:
+    threshold: 0.6
+    match_type: MatchType.FULL
+    fail_fast: True
+toxicity:
+  config:
+    threshold: 0.56
+    use_onnx: False
+    fail_fast: True
