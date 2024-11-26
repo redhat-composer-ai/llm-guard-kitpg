@@ -34,6 +34,17 @@ jobs:
           large-packages: true
           swap-storage: true
 
+      # https://stackoverflow.com/a/64210623
+      - name: Get branch name (merge)
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/} | tr / -)" >> $GITHUB_ENV
+
+      - name: Get branch name (pull request)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: echo "BRANCH_NAME=$(echo ${GITHUB_HEAD_REF} | tr / -)" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -53,4 +64,4 @@ jobs:
           context: .
           file: ./Containerfile
           push: true
-          tags: ${{ env.IMAGE_REGISTRY }}:${{ github.ref_name }}, ${{ env.IMAGE_REGISTRY }}:${GITHUB_REF##*/}
+          tags: ${{ env.IMAGE_REGISTRY }}:${{ github.ref_name }}, ${{ env.IMAGE_REGISTRY }}:${BRANCH_NAME}
