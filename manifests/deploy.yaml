@@ -1,0 +1,85 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: kitpg 
+  labels:
+    app: kitpg
+    application: kitpg
+    paas.redhat.com/appcode: CAI-001
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kitpg
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: kitpg
+        deployment: kitpg
+        paas.redhat.com/appcode: CAI-001
+    spec:
+      containers:
+        - resources:
+            limits:
+              cpu: 2
+              memory: 4Gi
+            requests:
+              cpu: 1
+              memory: 2Gi
+          terminationMessagePath: /dev/termination-log
+          name: kitpg
+          env:
+            - name: APP_FILE
+              value: "app.py"
+            - name: GIT_SSL_NO_VERIFY
+              value: "true"
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - containerPort: 8443
+          imagePullPolicy: Always
+          terminationMessagePolicy: File
+          image: 'images.paas.redhat.com/composer-ai/kitpg:dev'
+          livenessProbe:
+            failureThreshold: 3
+            exec:
+              command:
+              - ls
+              - /opt/app-root/
+            initialDelaySeconds: 15
+            periodSeconds: 90
+            successThreshold: 1
+            timeoutSeconds: 8
+          readinessProbe:
+            failureThreshold: 3
+            exec:
+              command:
+              - ls
+              - /opt/app-root/
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 8
+            initialDelaySeconds: 10
+      volumeMounts:
+        - name: kitpg-certs-volume
+          mountPath: /etc/pki/tls/certs/generated
+          readOnly: true
+      volumes:
+        - name: kitpg-certs-volume
+          secret:
+            secretName: kitpg-certs
+        - name: rhit-ca-crt
+          secret:
+            defaultMode: 420
+            secretName: rhit-ca-crt
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+
