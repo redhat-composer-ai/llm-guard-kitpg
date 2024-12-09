@@ -3,7 +3,8 @@ import os
 from utils import APP_CONFIG, _scanners_map
 
 I_SCANNERS = os.environ.get(
-    "INPUT_SCANNERS", "toxicity,prompt_injection,bantopics,anonymize"
+    #"INPUT_SCANNERS", "toxicity,prompt_injection,bantopics,anonymize"
+    "INPUT_SCANNERS", "toxicity,bantopics"
 ).split(",")
 
 O_SCANNERS = os.environ.get("OUTPUT_SCANNERS", "anonymize,no_refusal").split(",")
